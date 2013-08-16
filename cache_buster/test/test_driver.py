@@ -75,6 +75,7 @@ class DriverTests(unittest.TestCase):
             delete=lambda key: fail(f),
         )
         logger = pretend.stub(
+            msg=lambda s, **kwargs: None,
             err=pretend.call_recorder(lambda failure, table, key: None)
         )
         d = Driver(FormattingKeyThingy({
