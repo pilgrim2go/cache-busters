@@ -14,6 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+import pretend
+
+from twisted.internet.defer import succeed
 from twisted.trial import unittest
 
 from cache_buster.driver import Driver
@@ -23,3 +26,13 @@ from cache_buster.keys import FormattingKeyThingy
 class DriverTests(unittest.TestCase):
     def test_construct(self):
         Driver(FormattingKeyThingy({}), None)
+
+    def test_invalidate_row_calls_cache_delete(self):
+        cache = pretend.stub(
+            delete=pretend.call_recorder(lambda key: succeed(None))
+        )
+        d = Driver(FormattingKeyThingy({
+            "foo_table": ["bar", "baz"]
+        }), cache)
+        d.invalidate_row("foo_table", {})
+        self.assertEqual(cache.delete.calls, [pretend.call("bar"), pretend.call("baz")])

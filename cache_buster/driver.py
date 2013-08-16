@@ -23,3 +23,7 @@ class Driver(object):
     def __init__(self, fkt, cache):
         self._fkt = fkt
         self._cache = cache
+
+    def invalidate_row(self, table, row):
+        for key in self._fkt.keys_for_row(table, row):
+            self._cache.delete(key)
