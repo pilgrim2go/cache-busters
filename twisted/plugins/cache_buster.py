@@ -17,11 +17,11 @@ limitations under the License.
 from twisted.application.service import ServiceMaker
 
 
-CacheBusters = ServiceMaker(
+CacheBuster = ServiceMaker(
     ("An automatic cache invalidator which listens to a database replication "
      "protocol and then evicts keys from a cache."),
-    "cache_busters",
+    "cache_buster.tap",
     ("When there's something invalid, in your cache, who you gonna call, cache"
      "busters!"),
-    "cache-busters",
+    "cache-buster",
 )
