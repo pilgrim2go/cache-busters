@@ -13,18 +13,3 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-
-from twisted.application import service
-from twisted.python import usage
-
-
-class CacheBustersService(service.Service):
-    pass
-
-
-class Options(usage.Options):
-    pass
-
-
-def makeService(options):
-    raise NotImplementedError
