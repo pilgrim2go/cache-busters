@@ -24,4 +24,9 @@ class FormattingKeyThingy(object):
 
     def keys_for_row(self, table, row):
         for format in self._table_formats.get(table, []):
-            yield format.format(**row)
+            try:
+                yield format.format(**row)
+            except KeyError:
+                # TODO: Do not ignore this exception, at a minimum it should be
+                # logged
+                pass

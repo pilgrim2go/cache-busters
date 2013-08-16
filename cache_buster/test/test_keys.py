@@ -27,3 +27,15 @@ class FormattingKeyThingyTests(TestCase):
     def test_keys_for_row_format_pattern(self):
         fkt = FormattingKeyThingy({'foo': ["{user_id}"]})
         self.assertEqual(list(fkt.keys_for_row('foo', {'user_id': 'bob'})), ['bob'])
+
+    def test_keys_for_row_invalid_format_key(self):
+        fkt = FormattingKeyThingy({'foo': ["{user_id}"]})
+        self.assertEqual(list(fkt.keys_for_row('foo', {})), [])
+
+    def test_keys_for_row_does_not_stop_on_invalid_format(self):
+        fkt = FormattingKeyThingy({'foo': ["{user_id}", "bar"]})
+        self.assertEqual(list(fkt.keys_for_row('foo', {})), ["bar"])
+
+    def test_keys_for_row_multiple_keys(self):
+        fkt = FormattingKeyThingy({'foo': ['abc', 'def']})
+        self.assertEqual(list(fkt.keys_for_row('foo', {})), ['abc', 'def'])
