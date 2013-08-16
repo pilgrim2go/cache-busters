@@ -17,6 +17,18 @@ limitations under the License.
 from twisted.internet.defer import gatherResults
 
 
+def count_cache_results(results):
+    deletes = nonexistant = failures = 0
+    for r in results:
+        if r is None:
+            failures += 1
+        elif r:
+            deletes += 1
+        else:
+            nonexistant += 1
+    return deletes, nonexistant, failures
+
+
 class Driver(object):
     """
     :attr _fkt: A FormattingKeyThingy.
@@ -30,7 +42,13 @@ class Driver(object):
         self._logger = logger
 
     def invalidate_row(self, table, row):
+        def log_counts(results):
+            deletes, nonexistant, failures = count_cache_results(results)
+            self._logger.msg("cache_buster.driver.invalidated_rows",
+                deletes=deletes, nonexistant=nonexistant, failures=failures
+            )
+
         return gatherResults([
             self._cache.delete(key).addErrback(self._logger.err, table, key)
             for key in self._fkt.keys_for_row(table, row)
-        ]).addCallback(lambda _: None)
+        ]).addCallback(log_counts)

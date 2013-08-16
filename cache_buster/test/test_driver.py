@@ -20,7 +20,7 @@ from twisted.internet.defer import Deferred, succeed, fail
 from twisted.python.failure import Failure
 from twisted.trial import unittest
 
-from cache_buster.driver import Driver
+from cache_buster.driver import Driver, count_cache_results
 from cache_buster.keys import FormattingKeyThingy
 from cache_buster.test.doubles import DummyLogger
 
@@ -82,3 +82,71 @@ class DriverTests(unittest.TestCase):
         }), cache, logger)
         d.invalidate_row("foo_table", {})
         self.assertEqual(logger.err.calls, [pretend.call(f, "foo_table", "bar")])
+
+    def test_invalidate_row_logs_counts(self):
+        cache = pretend.stub(
+            delete=lambda key: succeed(True)
+        )
+        logger = pretend.stub(
+            err=None,
+            msg=pretend.call_recorder(lambda *args, **kwargs: None),
+        )
+        d = Driver(FormattingKeyThingy({
+            "foo_table": ["bar", "baz"]
+        }), cache, logger)
+        d.invalidate_row("foo_table", {})
+        self.assertEqual(logger.msg.calls, [
+            pretend.call("cache_buster.driver.invalidated_rows",
+                deletes=2, nonexistant=0, failures=0,
+            )
+        ])
+
+    def test_invalidate_row_logs_nonexistant_counts(self):
+        cache = pretend.stub(
+            delete=lambda key: succeed(False)
+        )
+        logger = pretend.stub(
+            err=None,
+            msg=pretend.call_recorder(lambda *args, **kwargs: None)
+        )
+        d = Driver(FormattingKeyThingy({
+            "foo_table": ["bar"]
+        }), cache, logger)
+        d.invalidate_row("foo_table", {})
+        self.assertEqual(logger.msg.calls, [
+            pretend.call("cache_buster.driver.invalidated_rows",
+                deletes=0, nonexistant=1, failures=0,
+            )
+        ])
+
+    def test_invalidate_row_logs_failure_counts(self):
+        cache = pretend.stub(
+            delete=lambda key: fail(Exception())
+        )
+        logger = pretend.stub(
+            err=lambda failure, table, key: None,
+            msg=pretend.call_recorder(lambda *args, **kwargs: None)
+        )
+        d = Driver(FormattingKeyThingy({
+            "foo_table": ["bar"]
+        }), cache, logger)
+        d.invalidate_row("foo_table", {})
+        self.assertEqual(logger.msg.calls, [
+            pretend.call("cache_buster.driver.invalidated_rows",
+                deletes=0, nonexistant=0, failures=1,
+            )
+        ])
+
+
+class CountCacheResultsTests(unittest.TestCase):
+    def test_many_results(self):
+        deletes, nonexistant, failures = count_cache_results([
+            True,
+            False,
+            None,
+            False,
+            True
+        ])
+        self.assertEqual(deletes, 2)
+        self.assertEqual(nonexistant, 2)
+        self.assertEqual(failures, 1)
