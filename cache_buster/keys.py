@@ -13,3 +13,15 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+
+class FormattingKeyThingy(object):
+    """
+    :attribute dict _table_formats: Mapping of table names to a list of key
+        formats.
+    """
+    def __init__(self, table_formats):
+        self._table_formats = table_formats
+
+    def keys_for_row(self, table, row):
+        for format in self._table_formats.get(table, []):
+            yield format.format(**row)
