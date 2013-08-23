@@ -24,7 +24,7 @@ from cache_buster.keys import FormattingKeyMaker
 class KeyMakerTests(TestCase):
     def test_from_yaml(self):
         key_maker = FormattingKeyMaker.from_yaml(textwrap.dedent("""
-        invalidations:
+        on_update:
             foo_table:
                 - column1
                 - column2

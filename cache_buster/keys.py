@@ -25,7 +25,7 @@ class FormattingKeyMaker(object):
 
     @classmethod
     def from_yaml(cls, ini_string):
-        return cls(yaml.safe_load(ini_string)["invalidations"])
+        return cls(yaml.safe_load(ini_string)["on_update"])
 
     def __init__(self, table_formats):
         self._table_formats = table_formats
