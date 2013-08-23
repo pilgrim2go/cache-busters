@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from twisted.internet.defer import succeed
+from twisted.internet.defer import succeed, gatherResults
 from twisted.internet.protocol import Factory
 from twisted.protocols.memcache import MemCacheProtocol
 
@@ -49,4 +49,20 @@ class MemcachedCache(object):
 
         d = self._endpoint.connect(self._factory)
         d.addCallback(when_connected)
+        return d
+
+
+class MultiCache(object):
+    def __init__(self, caches):
+        self._caches = caches
+
+    def delete(self, key):
+        def when_all_deleted(results):
+            return any(results)
+
+        d = gatherResults([
+            c.delete(key)
+            for c in self._caches
+        ], consumeErrors=True)
+        d.addCallback(when_all_deleted)
         return d

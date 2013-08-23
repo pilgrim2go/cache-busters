@@ -15,12 +15,12 @@ limitations under the License.
 """
 import pretend
 
-from twisted.internet.defer import succeed, Deferred
+from twisted.internet.defer import succeed, fail, Deferred
 from twisted.internet.protocol import Factory
 from twisted.trial.unittest import TestCase
 from twisted.protocols.memcache import MemCacheProtocol
 
-from cache_buster.caches import InMemoryCache, MemcachedCache
+from cache_buster.caches import InMemoryCache, MemcachedCache, MultiCache
 
 
 class MemcachedCacheTests(TestCase):
@@ -141,3 +141,26 @@ class InMemoryCacheTests(TestCase):
         self.successResultOf(d)
         self.assertEqual(storage, {})
 
+
+class MultiCacheTests(TestCase):
+    def test_delete_returns_true_when_any_return_true(self):
+        c1 = InMemoryCache({})
+        c2 = InMemoryCache({"foo": "bar"})
+        cache = MultiCache([c1, c2])
+        d = cache.delete("foo")
+        self.assertTrue(self.successResultOf(d))
+
+    def test_delete_returns_false_when_all_return_false(self):
+        c1 = InMemoryCache({})
+        c2 = InMemoryCache({})
+        cache = MultiCache([c1, c2])
+        d = cache.delete("foo")
+        self.assertFalse(self.successResultOf(d))
+
+    def test_delete_errbacks_when_any_errback(self):
+        cache = MultiCache([
+            pretend.stub(delete=lambda key: fail(ValueError()))
+        ])
+        d = cache.delete("foo")
+        exc = self.failureResultOf(d)
+        self.assertIsInstance(exc.value.subFailure.value, ValueError)
