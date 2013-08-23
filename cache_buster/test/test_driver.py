@@ -21,26 +21,26 @@ from twisted.python.failure import Failure
 from twisted.trial import unittest
 
 from cache_buster.driver import Driver, count_cache_results
-from cache_buster.keys import FormattingKeyThingy
+from cache_buster.keys import FormattingKeyMaker
 from cache_buster.test.doubles import DummyLogger
 
 
 class DriverTests(unittest.TestCase):
     def test_construct(self):
-        Driver(FormattingKeyThingy({}), None, None)
+        Driver(FormattingKeyMaker({}), None, None)
 
     def test_invalidate_row_calls_cache_delete(self):
         cache = pretend.stub(
             delete=pretend.call_recorder(lambda key: succeed(None))
         )
-        d = Driver(FormattingKeyThingy({
+        d = Driver(FormattingKeyMaker({
             "foo_table": ["bar", "baz"]
         }), cache, DummyLogger())
         d.invalidate_row("foo_table", {})
         self.assertEqual(cache.delete.calls, [pretend.call("bar"), pretend.call("baz")])
 
     def test_invalidate_row_returns_deferred(self):
-        d = Driver(FormattingKeyThingy({}), None, DummyLogger())
+        d = Driver(FormattingKeyMaker({}), None, DummyLogger())
         res = self.successResultOf(d.invalidate_row("foo_table", {}))
         self.assertIs(res, None)
 
@@ -49,7 +49,7 @@ class DriverTests(unittest.TestCase):
         cache = pretend.stub(
             delete=lambda key: d1,
         )
-        d = Driver(FormattingKeyThingy({
+        d = Driver(FormattingKeyMaker({
             "foo_table": ["bar"]
         }), cache, DummyLogger())
         invalidate_d = d.invalidate_row("foo_table", {})
@@ -62,7 +62,7 @@ class DriverTests(unittest.TestCase):
         cache = pretend.stub(
             delete=lambda key: fail(Exception()),
         )
-        d = Driver(FormattingKeyThingy({
+        d = Driver(FormattingKeyMaker({
             "foo_table": ["bar"]
         }), cache, DummyLogger())
         invalidate_d = d.invalidate_row("foo_table", {})
@@ -78,7 +78,7 @@ class DriverTests(unittest.TestCase):
             msg=lambda s, **kwargs: None,
             err=pretend.call_recorder(lambda failure, table, key: None)
         )
-        d = Driver(FormattingKeyThingy({
+        d = Driver(FormattingKeyMaker({
             "foo_table": ["bar"]
         }), cache, logger)
         d.invalidate_row("foo_table", {})
@@ -92,7 +92,7 @@ class DriverTests(unittest.TestCase):
             err=None,
             msg=pretend.call_recorder(lambda *args, **kwargs: None),
         )
-        d = Driver(FormattingKeyThingy({
+        d = Driver(FormattingKeyMaker({
             "foo_table": ["bar", "baz"]
         }), cache, logger)
         d.invalidate_row("foo_table", {})
@@ -110,7 +110,7 @@ class DriverTests(unittest.TestCase):
             err=None,
             msg=pretend.call_recorder(lambda *args, **kwargs: None)
         )
-        d = Driver(FormattingKeyThingy({
+        d = Driver(FormattingKeyMaker({
             "foo_table": ["bar"]
         }), cache, logger)
         d.invalidate_row("foo_table", {})
@@ -128,7 +128,7 @@ class DriverTests(unittest.TestCase):
             err=lambda failure, table, key: None,
             msg=pretend.call_recorder(lambda *args, **kwargs: None)
         )
-        d = Driver(FormattingKeyThingy({
+        d = Driver(FormattingKeyMaker({
             "foo_table": ["bar"]
         }), cache, logger)
         d.invalidate_row("foo_table", {})

@@ -17,7 +17,7 @@ limitations under the License.
 import yaml
 
 
-class FormattingKeyThingy(object):
+class FormattingKeyMaker(object):
     """
     :attribute dict _table_formats: Mapping of table names to a list of key
         formats.
