@@ -21,3 +21,11 @@ class DummyLogger(object):
 
     def err(self, *args, **kwargs):
         pass
+
+
+class FakeReactor(object):
+    def callInThread(self, f, *args, **kwargs):
+        f(*args, **kwargs)
+
+    def callFromThread(self, f, *args, **kwargs):
+        f(*args, **kwargs)

@@ -44,13 +44,15 @@ class MySQLDatabaseListener(object):
         self._driver = driver
 
     def __iter__(self):
-        while True:
+        def fetch_and_process():
             event = self._connection.fetchone()
             if (event.event_type == UPDATE_ROWS_EVENT_V1 or
                 event.event_type == UPDATE_ROWS_EVENT_V2):
                 for row in event.rows:
-                    yield self._driver.invalidate_row(
+                    self._reactor.callFromThread(self._driver.invalidate_row,
                         event.table, row["before_values"]
                     )
-            else:
-                yield
+
+        while True:
+            self._reactor.callInThread(fetch_and_process)
+            yield
