@@ -22,16 +22,16 @@ from pymysqlreplication.constants import (
 class MySQLDatabaseListener(object):
     def __init__(self, reactor, connection, driver):
         super(MySQLDatabaseListener, self).__init__()
-        self.reactor = reactor
-        self.connection = connection
-        self.driver = driver
+        self._reactor = reactor
+        self._connection = connection
+        self._driver = driver
 
     def __iter__(self):
         while True:
-            event = self.connection.fetchone()
+            event = self._connection.fetchone()
             if (event.event_type == UPDATE_ROWS_EVENT_V1 or
                 event.event_type == UPDATE_ROWS_EVENT_V2):
                 for row in event.rows:
-                    yield self.driver.invalidate_row(event.table, row["before_values"])
+                    yield self._driver.invalidate_row(event.table, row["before_values"])
             else:
                 yield
