@@ -85,7 +85,7 @@ class DriverTests(unittest.TestCase):
         }), cache, logger)
         d.invalidate_row("foo_table", {})
         self.assertEqual(logger.err.calls, [
-            pretend.call(f, "foo_table", "bar")
+            pretend.call(f, table="foo_table", key="bar")
         ])
 
     def test_invalidate_row_logs_counts(self):

@@ -53,6 +53,6 @@ class Driver(object):
             )
 
         return gatherResults([
-            self._cache.delete(key).addErrback(self._logger.err)
+            self._cache.delete(key).addErrback(self._logger.err, table=table, key=key)
             for key in self._key_maker.keys_for_row(table, row)
         ]).addCallback(log_counts)

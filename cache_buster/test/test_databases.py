@@ -24,6 +24,7 @@ from twisted.internet.defer import Deferred
 from twisted.trial.unittest import TestCase
 
 from cache_buster.databases import MySQLDatabaseListener
+from cache_buster.test.doubles import DummyLogger
 
 
 class MySQLDatabaseListenerTests(TestCase):
@@ -44,7 +45,7 @@ class MySQLDatabaseListenerTests(TestCase):
         driver = pretend.stub(
             invalidate_row=pretend.call_recorder(lambda table, row: d)
         )
-        listener = MySQLDatabaseListener(None, connection, driver)
+        listener = MySQLDatabaseListener(None, connection, driver, DummyLogger())
         iterable = iter(listener)
         res = next(iterable)
         self.assertEqual(driver.invalidate_row.calls, [
@@ -62,7 +63,7 @@ class MySQLDatabaseListenerTests(TestCase):
         driver = pretend.stub(
             invalidate_row=pretend.call_recorder(lambda table, row: d)
         )
-        listener = MySQLDatabaseListener(None, connection, driver)
+        listener = MySQLDatabaseListener(None, connection, driver, DummyLogger())
         iterable = iter(listener)
         res = next(iterable)
         self.assertEqual(driver.invalidate_row.calls, [
@@ -74,7 +75,7 @@ class MySQLDatabaseListenerTests(TestCase):
         connection = pretend.stub(
             fetchone=lambda: self.create_event(None, None, None)
         )
-        listener = MySQLDatabaseListener(None, connection, None)
+        listener = MySQLDatabaseListener(None, connection, None, DummyLogger())
         iterable = iter(listener)
         res = next(iterable)
         self.assertIs(res, None)
@@ -91,7 +92,7 @@ class MySQLDatabaseListenerTests(TestCase):
         driver = pretend.stub(
             invalidate_row=pretend.call_recorder(lambda table, row: None)
         )
-        listener = MySQLDatabaseListener(None, connection, driver)
+        listener = MySQLDatabaseListener(None, connection, driver, DummyLogger())
         iterable = iter(listener)
         next(iterable)
         next(iterable)
