@@ -37,17 +37,21 @@ class DatabaseListenerService(Service):
 
 
 class MySQLDatabaseListener(object):
-    def __init__(self, reactor, connection, driver):
+    def __init__(self, reactor, connection, driver, logger):
         super(MySQLDatabaseListener, self).__init__()
         self._reactor = reactor
         self._connection = connection
         self._driver = driver
+        self._logger = logger
 
     def __iter__(self):
         while True:
             event = self._connection.fetchone()
             if (event.event_type == UPDATE_ROWS_EVENT_V1 or
                 event.event_type == UPDATE_ROWS_EVENT_V2):
+                self._logger.msg("cache_buster.databases.mysql.update",
+                    num_rows=len(event.rows)
+                )
                 for row in event.rows:
                     yield self._driver.invalidate_row(
                         event.table, row["before_values"]

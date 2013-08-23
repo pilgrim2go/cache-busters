@@ -55,6 +55,6 @@ def makeService(options):
 
     connection = BinLogStreamReader(connection_settings=config['database'])
 
-    listener = MySQLDatabaseListener(reactor, connection, driver)
+    listener = MySQLDatabaseListener(reactor, connection, driver, log)
 
     return DatabaseListenerService(cooperator, listener, log)
