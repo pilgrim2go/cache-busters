@@ -18,6 +18,23 @@ from pymysqlreplication.constants import (
     UPDATE_ROWS_EVENT_V1, UPDATE_ROWS_EVENT_V2
 )
 
+from twisted.application.service import Service
+
+
+class DatabaseListenerService(Service):
+    def __init__(self, cooperator, listener, log):
+        self._listener = listener
+        self._cooperator = cooperator
+        self._log = log
+        self._task = None
+
+    def startService(self):
+        self._task = self._cooperator.cooperate(iter(self._listener))
+        self._task.whenDone().addErrback(self._log.err)
+
+    def stopService(self):
+        return self._task.stop()
+
 
 class MySQLDatabaseListener(object):
     def __init__(self, reactor, connection, driver):

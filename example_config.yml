@@ -1,0 +1,10 @@
+caches:
+  - "127.0.0.1"
+
+on_update:
+  test_table:
+    - "{id}-{name}"
+
+database:
+  host: "127.0.0.1"
+  user: "root"
