@@ -18,29 +18,21 @@ Basic architecture:
 * It never tries to repopulate a cache, only flush.
 * An example configuration file (need to figure out the REST equivalent)::
 
-    [database]
-    type = postgresql
-    host = 192.168.1.1
-    # etc.
+  caches:
+    - "127.0.0.1"
 
-    [cache]
-    type = memcache
-    host = 192.168.1.1
-    # etc.
+  database:
+    host: "127.0.0.1"
+    user: "root"
 
-    [table_name]
-    col_name =
-        key_name:{with_field_interpolation}
-        {field}-other-key
+  on_update:
+    test_table:
+      - "{id}-{name}"
+    animals:
+      - "{id}-{name}"
 
 TODO
 ----
 
 * Figure out what sort of cooperation we need to pretend to be a slave.
 * In multi-tenanted mode how does the networking for all this work out.
-* If the user has a pool of caches, how do we invalidate, ``DELETE`` on all
-  servers, or do we try to use their pooling algorithm. (Almost definitely
-  ``DELETE`` to all, we can't know how the user is sharding, and they probably
-  get it wrong anyways).
-* Did we seriously end up with a distributed coordination problem?
-* Punt on multi-tenancy and just make it run as an agent on trove boxes?
