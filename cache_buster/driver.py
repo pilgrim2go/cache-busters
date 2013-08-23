@@ -31,13 +31,13 @@ def count_cache_results(results):
 
 class Driver(object):
     """
-    :attr _fkt: A FormattingKeyThingy.
+    :attr _key_maker: An IKeyMaker.
     :attr _cache: A CacheDeleter.
     :attr _logger: A logger.
     """
 
-    def __init__(self, fkt, cache, logger):
-        self._fkt = fkt
+    def __init__(self, _key_maker, cache, logger):
+        self._key_maker = _key_maker
         self._cache = cache
         self._logger = logger
 
@@ -50,5 +50,5 @@ class Driver(object):
 
         return gatherResults([
             self._cache.delete(key).addErrback(self._logger.err, table, key)
-            for key in self._fkt.keys_for_row(table, row)
+            for key in self._key_maker.keys_for_row(table, row)
         ]).addCallback(log_counts)
