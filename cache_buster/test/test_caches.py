@@ -17,8 +17,8 @@ import pretend
 
 from twisted.internet.defer import succeed, fail, Deferred
 from twisted.internet.protocol import Factory
-from twisted.trial.unittest import TestCase
 from twisted.protocols.memcache import MemCacheProtocol
+from twisted.trial.unittest import TestCase
 
 from cache_buster.caches import InMemoryCache, MemcachedCache, MultiCache
 
