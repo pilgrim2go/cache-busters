@@ -29,15 +29,24 @@ class KeyMakerTests(TestCase):
                 - column1
                 - column2
         """))
-        self.assertEqual(list(key_maker.keys_for_row("foo_table", {})), ["column1", "column2"])
+        self.assertEqual(
+            list(key_maker.keys_for_row("foo_table", {})),
+            ["column1", "column2"]
+        )
 
     def test_keys_for_row_constant_string(self):
         key_maker = FormattingKeyMaker({"foo": ["the_big_cache"]})
-        self.assertEqual(list(key_maker.keys_for_row("foo", {})), ["the_big_cache"])
+        self.assertEqual(
+            list(key_maker.keys_for_row("foo", {})),
+            ["the_big_cache"]
+        )
 
     def test_keys_for_row_format_pattern(self):
         key_maker = FormattingKeyMaker({"foo": ["{user_id}"]})
-        self.assertEqual(list(key_maker.keys_for_row("foo", {"user_id": "bob"})), ["bob"])
+        self.assertEqual(
+            list(key_maker.keys_for_row("foo", {"user_id": "bob"})),
+            ["bob"]
+        )
 
     def test_keys_for_row_invalid_format_key(self):
         key_maker = FormattingKeyMaker({"foo": ["{user_id}"]})
@@ -49,4 +58,7 @@ class KeyMakerTests(TestCase):
 
     def test_keys_for_row_multiple_keys(self):
         key_maker = FormattingKeyMaker({"foo": ["abc", "def"]})
-        self.assertEqual(list(key_maker.keys_for_row("foo", {})), ["abc", "def"])
+        self.assertEqual(
+            list(key_maker.keys_for_row("foo", {})),
+            ["abc", "def"]
+        )

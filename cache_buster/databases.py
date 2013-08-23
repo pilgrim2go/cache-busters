@@ -32,6 +32,8 @@ class MySQLDatabaseListener(object):
             if (event.event_type == UPDATE_ROWS_EVENT_V1 or
                 event.event_type == UPDATE_ROWS_EVENT_V2):
                 for row in event.rows:
-                    yield self._driver.invalidate_row(event.table, row["before_values"])
+                    yield self._driver.invalidate_row(
+                        event.table, row["before_values"]
+                    )
             else:
                 yield

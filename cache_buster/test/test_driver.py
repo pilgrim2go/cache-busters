@@ -37,14 +37,16 @@ class DriverTests(unittest.TestCase):
             "foo_table": ["bar", "baz"]
         }), cache, DummyLogger())
         d.invalidate_row("foo_table", {})
-        self.assertEqual(cache.delete.calls, [pretend.call("bar"), pretend.call("baz")])
+        self.assertEqual(cache.delete.calls, [
+            pretend.call("bar"), pretend.call("baz")
+        ])
 
     def test_invalidate_row_returns_deferred(self):
         d = Driver(FormattingKeyMaker({}), None, DummyLogger())
         res = self.successResultOf(d.invalidate_row("foo_table", {}))
         self.assertIs(res, None)
 
-    def test_invalidate_row_returns_deferred_fired_when_cache_delete_fires(self):
+    def test_invalidate_row_waits_for_cache_delete(self):
         d1 = Deferred()
         cache = pretend.stub(
             delete=lambda key: d1,
@@ -82,7 +84,9 @@ class DriverTests(unittest.TestCase):
             "foo_table": ["bar"]
         }), cache, logger)
         d.invalidate_row("foo_table", {})
-        self.assertEqual(logger.err.calls, [pretend.call(f, "foo_table", "bar")])
+        self.assertEqual(logger.err.calls, [
+            pretend.call(f, "foo_table", "bar")
+        ])
 
     def test_invalidate_row_logs_counts(self):
         cache = pretend.stub(
