@@ -20,6 +20,10 @@ from twisted.protocols.memcache import MemCacheProtocol
 
 
 class InMemoryCache(object):
+    """
+    Stores values in a python dictionary. For testing only. Do not use.
+    """
+
     def __init__(self, storage):
         self._storage = storage
 
@@ -33,6 +37,10 @@ class InMemoryCache(object):
 
 
 class MemcachedCache(object):
+    """
+    A cache backed by a memcached server running at some endpoint.
+    """
+
     def __init__(self, endpoint):
         self._endpoint = endpoint
         self._factory = Factory.forProtocol(MemCacheProtocol)
@@ -53,6 +61,11 @@ class MemcachedCache(object):
 
 
 class MultiCache(object):
+    """
+    A cache backed by many other caches, if any of them error it errors, if any
+    of them find a value on delete, it suceeds.
+    """
+
     def __init__(self, caches):
         self._caches = caches
 

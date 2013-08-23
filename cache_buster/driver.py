@@ -42,6 +42,10 @@ class Driver(object):
         self._logger = logger
 
     def invalidate_row(self, table, row):
+        """
+        Invalidates the cache given the data from a given row in a table.
+        """
+
         def log_counts(results):
             deletes, nonexistant, failures = count_cache_results(results)
             self._logger.msg("cache_buster.driver.invalidated_rows",
