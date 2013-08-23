@@ -4,6 +4,8 @@ caches:
 on_update:
   test_table:
     - "{id}-{name}"
+  animals:
+    - "{id}-{name}"
 
 database:
   host: "127.0.0.1"
