@@ -14,8 +14,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+from twisted.internet.defer import succeed
 from twisted.internet.protocol import Factory
 from twisted.protocols.memcache import MemCacheProtocol
+
+
+class InMemoryCache(object):
+    def __init__(self, storage):
+        self._storage = storage
+
+    def delete(self, key):
+        try:
+            del self._storage[key]
+        except KeyError:
+            return succeed(False)
+        else:
+            return succeed(True)
 
 
 class MemcachedCache(object):

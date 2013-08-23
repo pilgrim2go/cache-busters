@@ -20,7 +20,7 @@ from twisted.internet.protocol import Factory
 from twisted.trial.unittest import TestCase
 from twisted.protocols.memcache import MemCacheProtocol
 
-from cache_buster.caches import MemcachedCache
+from cache_buster.caches import InMemoryCache, MemcachedCache
 
 
 class MemcachedCacheTests(TestCase):
@@ -121,3 +121,23 @@ class MemcachedCacheTests(TestCase):
             [pretend.call()]
         )
         self.failureResultOf(d2, ValueError)
+
+
+class InMemoryCacheTests(TestCase):
+    def test_delete_returns_true_when_key_is_present(self):
+        cache = InMemoryCache({"foo": "bar"})
+        d = cache.delete("foo")
+        self.assertTrue(self.successResultOf(d))
+
+    def test_delete_returns_false_when_is_not_present(self):
+        cache = InMemoryCache({})
+        d = cache.delete("foo")
+        self.assertFalse(self.successResultOf(d))
+
+    def test_delete_removes_item_from_storage(self):
+        storage = {"foo": "bar"}
+        cache = InMemoryCache(storage)
+        d = cache.delete("foo")
+        self.successResultOf(d)
+        self.assertEqual(storage, {})
+
