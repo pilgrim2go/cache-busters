@@ -24,7 +24,6 @@ from twisted.internet.defer import Deferred
 from twisted.trial.unittest import TestCase
 
 from cache_buster.databases import MySQLDatabaseListener
-from cache_buster.test.doubles import FakeReactor
 
 
 class MySQLDatabaseListenerTests(TestCase):
@@ -45,12 +44,13 @@ class MySQLDatabaseListenerTests(TestCase):
         driver = pretend.stub(
             invalidate_row=pretend.call_recorder(lambda table, row: d)
         )
-        listener = MySQLDatabaseListener(FakeReactor(), connection, driver)
+        listener = MySQLDatabaseListener(None, connection, driver)
         iterable = iter(listener)
-        next(iterable)
+        res = next(iterable)
         self.assertEqual(driver.invalidate_row.calls, [
             pretend.call("my_table", {}),
         ])
+        self.assertIs(res, d)
 
     def test_calls_invalidate_row_on_update_row_v2(self):
         connection = pretend.stub(
@@ -62,20 +62,22 @@ class MySQLDatabaseListenerTests(TestCase):
         driver = pretend.stub(
             invalidate_row=pretend.call_recorder(lambda table, row: d)
         )
-        listener = MySQLDatabaseListener(FakeReactor(), connection, driver)
+        listener = MySQLDatabaseListener(None, connection, driver)
         iterable = iter(listener)
-        next(iterable)
+        res = next(iterable)
         self.assertEqual(driver.invalidate_row.calls, [
             pretend.call("my_table", {}),
         ])
+        self.assertIs(res, d)
 
     def test_ignores_unknown_event_types(self):
         connection = pretend.stub(
             fetchone=lambda: self.create_event(None, None, None)
         )
-        listener = MySQLDatabaseListener(FakeReactor(), connection, None)
+        listener = MySQLDatabaseListener(None, connection, None)
         iterable = iter(listener)
-        next(iterable)
+        res = next(iterable)
+        self.assertIs(res, None)
 
     def test_calls_invalidate_row_multiple_times_on_update_row(self):
         connection = pretend.stub(
@@ -89,8 +91,9 @@ class MySQLDatabaseListenerTests(TestCase):
         driver = pretend.stub(
             invalidate_row=pretend.call_recorder(lambda table, row: None)
         )
-        listener = MySQLDatabaseListener(FakeReactor(), connection, driver)
+        listener = MySQLDatabaseListener(None, connection, driver)
         iterable = iter(listener)
+        next(iterable)
         next(iterable)
         self.assertEqual(driver.invalidate_row.calls, [
             pretend.call("my_table", {}),
