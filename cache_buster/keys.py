@@ -14,18 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-import yaml
-
-
 class FormattingKeyMaker(object):
     """
     :attribute dict _table_formats: Mapping of table names to a list of key
         formats.
     """
-
-    @classmethod
-    def from_yaml(cls, ini_string):
-        return cls(yaml.safe_load(ini_string)["on_update"])
 
     def __init__(self, table_formats):
         self._table_formats = table_formats

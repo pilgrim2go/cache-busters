@@ -44,7 +44,7 @@ def makeService(options):
     with open(options['config']) as f:
         data = f.read()
         config = yaml.safe_load(data)
-        key_maker = FormattingKeyMaker.from_yaml(data)
+        key_maker = FormattingKeyMaker(data["on_update"])
 
     cache_backend = MultiCache([
         MemcachedCache(TCP4ClientEndpoint(reactor, cache, DEFAULT_PORT))

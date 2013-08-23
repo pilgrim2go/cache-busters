@@ -22,18 +22,6 @@ from cache_buster.keys import FormattingKeyMaker
 
 
 class KeyMakerTests(TestCase):
-    def test_from_yaml(self):
-        key_maker = FormattingKeyMaker.from_yaml(textwrap.dedent("""
-        on_update:
-            foo_table:
-                - column1
-                - column2
-        """))
-        self.assertEqual(
-            list(key_maker.keys_for_row("foo_table", {})),
-            ["column1", "column2"]
-        )
-
     def test_keys_for_row_constant_string(self):
         key_maker = FormattingKeyMaker({"foo": ["the_big_cache"]})
         self.assertEqual(
